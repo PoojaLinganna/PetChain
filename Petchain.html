@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PetChain: Decentralizing Animal Welfare</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Custom Font Setup */
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        h1, h2, h3, h4, .font-heading { font-family: 'Space Grotesk', sans-serif; }
+
+        /* Chart Container Utilities */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container { height: 350px; }
+        }
+
+        /* Interactive Element Styles */
+        .interactive-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .interactive-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px -5px rgba(16, 185, 129, 0.4); /* Stronger Emerald Shadow on hover */
+        }
+
+        /* Custom Range Slider - Now Emerald Themed */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 24px;
+            width: 24px;
+            border-radius: 50%;
+            background: #059669; /* Darker Emerald */
+            cursor: pointer;
+            margin-top: -10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #a7f3d0; /* Light Emerald */
+            border-radius: 2px;
+        }
+
+        /* Modal Overlay backdrop */
+        .modal-overlay {
+            background-color: rgba(30, 41, 59, 0.7);
+            z-index: 100;
+        }
+
+        /* Subtle Paw Print Background */
+        .paw-bg {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' opacity='0.08'%3E%3Cpath fill='%23ffffff' d='M50 0C36.8 0 26 10.8 26 24s10.8 24 24 24 24-10.8 24-24-10.8-24-24-24zM30 60c0 4.4 3.6 8 8 8s8-3.6 8-8-3.6-8-8-8-8 3.6-8 8zM62 60c0 4.4 3.6 8 8 8s8-3.6 8-8-3.6-8-8-8-8 3.6-8 8zM42 80c0 4.4 3.6 8 8 8s8-3.6 8-8-3.6-8-8-8-8 3.6-8 8z'/%3E%3C/svg%3E");
+            background-size: 80px 80px;
+        }
+
+        /* Hero Image Background */
+        .hero-bg-img {
+            background-image: url('https://placehold.co/1200x500/065f46/ffffff?text=Happy+Adopted+Pets');
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <!-- Pet-friendly logo icon -->
+                    <i class="fa-solid fa-paw text-emerald-600 text-2xl mr-2 animate-bounce-slow"></i>
+                    <span class="font-heading text-2xl font-extrabold text-slate-800">PetChain</span>
+                </div>
+                <div class="hidden sm:flex items-center space-x-8">
+                    <a href="#problem" class="text-slate-600 hover:text-emerald-600 font-medium transition py-2 border-b-2 border-transparent hover:border-emerald-500">Challenges</a>
+                    <a href="#solution" class="text-slate-600 hover:text-emerald-600 font-medium transition py-2 border-b-2 border-transparent hover:border-emerald-500">Architecture</a>
+                    <a href="#tokenomics" class="text-slate-600 hover:text-emerald-600 font-medium transition py-2 border-b-2 border-transparent hover:border-emerald-500">Economy</a>
+                    <a href="#dao" class="text-slate-600 hover:text-emerald-600 font-medium transition py-2 border-b-2 border-transparent hover:border-emerald-500">Simulator</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-gradient-to-br from-emerald-600 to-emerald-700 text-white pt-20 pb-24 relative overflow-hidden hero-bg-img">
+        <!-- Friendly, subtle background pattern -->
+        <div class="absolute inset-0 opacity-80 bg-gradient-to-br from-emerald-800/90 to-emerald-900/95"></div>
+        <div class="absolute inset-0 opacity-15 paw-bg"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+            <span class="inline-block py-1 px-4 rounded-full bg-emerald-700/60 border border-emerald-300/50 text-emerald-100 text-sm font-semibold mb-6 shadow-xl">
+                Decentralizing Care for Every Pet
+            </span>
+            <h1 class="text-5xl md:text-7xl font-bold tracking-tight mb-6 leading-tight text-white drop-shadow-lg">
+                Building a <span class="text-sky-300">Trustworthy Chain</span> of Care
+            </h1>
+            <p class="text-xl text-emerald-100 max-w-3xl mx-auto mb-10 drop-shadow-md">
+                A secure, dual-token economic model ensuring every pet's history is immediately verifiable and accessible by trusted caregivers—making life better for our furry friends.
+            </p>
+            <div class="flex justify-center gap-4">
+                <a href="#solution" class="px-10 py-3 bg-white text-emerald-600 hover:bg-emerald-100 rounded-full font-bold transition duration-300 shadow-xl shadow-emerald-900/25 transform hover:scale-105">
+                    Explore the Tech <i class="fa-solid fa-arrow-right ml-2 text-sm"></i>
+                </a>
+                <a href="#dao" class="px-10 py-3 bg-emerald-800 hover:bg-emerald-700 rounded-full font-bold text-white transition duration-300 border border-emerald-600 shadow-lg">
+                    Test the Economy
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Section 1: The Problem (Pain Points) -->
+    <section id="problem" class="py-20 bg-slate-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-slate-900 mb-4 flex items-center justify-center">
+                    <i class="fa-solid fa-triangle-exclamation text-amber-500 mr-3"></i> The Current Challenges in Pet Care
+                </h2>
+                <p class="text-lg text-slate-600 max-w-3xl mx-auto">
+                    We're solving three critical issues that prevent vets and shelters from collaborating efficiently to provide the best, most timely care for animals in need.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Card 1: Data Silos -->
+                <div class="interactive-card bg-white p-8 rounded-2xl border border-slate-200 shadow-lg hover:shadow-xl" onclick="toggleProblemDetails('p1')">
+                    <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="fa-solid fa-hospital-alt text-3xl text-red-500"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-3">Disconnected Clinics</h3>
+                    <p class="text-slate-600 mb-4">A pet's essential medical history is trapped in disconnected local clinic files, slowing down emergency response.</p>
+                    <div id="p1-details" class="hidden text-sm text-slate-500 bg-red-50 p-4 rounded-lg border border-red-200 mt-4">
+                        <strong>Example:</strong> A dog in transit from an adoption agency is injured. The emergency vet cannot access its complex history of allergies and previous surgeries, forcing delays for critical diagnostic steps.
+                    </div>
+                    <button class="text-emerald-600 text-sm font-semibold mt-4 flex items-center">
+                        Toggle Details <i class="fa-solid fa-chevron-down ml-1 text-xs transition-transform duration-300" id="p1-icon"></i>
+                    </button>
+                </div>
+
+                <!-- Card 2: Trust Deficit -->
+                <div class="interactive-card bg-white p-8 rounded-2xl border border-slate-200 shadow-lg hover:shadow-xl" onclick="toggleProblemDetails('p2')">
+                    <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="fa-solid fa-shield-virus text-3xl text-amber-500"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-3">Verification Gaps</h3>
+                    <p class="text-slate-600 mb-4">There is no single, immutable source of truth for vaccination records or official ownership transfers.</p>
+                    <div id="p2-details" class="hidden text-sm text-slate-500 bg-amber-50 p-4 rounded-lg border border-amber-200 mt-4">
+                        <strong>Example:</strong> Insurance claims often require extensive paper trails to prove a pet received necessary preventative care, leading to disputes and long processing times. Blockchain verification simplifies this instantly.
+                    </div>
+                    <button class="text-emerald-600 text-sm font-semibold mt-4 flex items-center">
+                        Toggle Details <i class="fa-solid fa-chevron-down ml-1 text-xs transition-transform duration-300" id="p2-icon"></i>
+                    </button>
+                </div>
+
+                <!-- Card 3: Incentives -->
+                <div class="interactive-card bg-white p-8 rounded-2xl border border-slate-200 shadow-lg hover:shadow-xl" onclick="toggleProblemDetails('p3')">
+                    <div class="w-16 h-16 bg-sky-100 rounded-full flex items-center justify-center mb-6">
+                        <i class="fa-solid fa-handshake-alt text-3xl text-sky-500"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-3">No Sharing Incentive</h3>
+                    <p class="text-slate-600 mb-4">Clinics lack economic motivation to spend time and resources integrating and sharing health data proactively.</p>
+                    <div id="p3-details" class="hidden text-sm text-slate-500 bg-sky-50 p-4 rounded-lg border border-sky-200 mt-4">
+                        <strong>Example:</strong> When a vet enters a record, they typically get nothing for the effort. PetChain rewards them with $POT tokens, creating a sustainable financial loop that promotes data integrity and sharing.
+                    </div>
+                    <button class="text-emerald-600 text-sm font-semibold mt-4 flex items-center">
+                        Toggle Details <i class="fa-solid fa-chevron-down ml-1 text-xs transition-transform duration-300" id="p3-icon"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 2: Solution (Dual Token) -->
+    <section id="solution" class="py-20 bg-emerald-50 border-y border-emerald-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+
+                <!-- Description -->
+                <div>
+                    <span class="text-emerald-600 font-bold tracking-wider text-sm uppercase mb-3 block">Our Solution</span>
+                    <h2 class="text-4xl font-bold text-slate-900 mb-6 flex items-center">
+                        Heart-First Dual-Token System
+                        <!-- Placeholder Image: Focus on tokens/technology -->
+                        <img src="https://placehold.co/60x60/d1fae5/065f46?text=NFT" alt="Pet NFT and POT token icon" class="w-12 h-12 rounded-full ml-4 shadow-md border-2 border-emerald-400" onerror="this.style.display='none'">
+                    </h2>
+                    <p class="text-lg text-slate-600 mb-8">
+                        The core of PetChain is the separation of identity (PetNFT) from the governance token (POT). This protects pet privacy while ensuring a secure, rewarded ecosystem for care providers.
+                    </p>
+
+                    <div class="space-y-4">
+                        <div class="p-4 border-l-4 border-amber-500 bg-white hover:bg-amber-50 transition rounded-xl shadow-md">
+                            <h4 class="font-bold text-amber-800 flex items-center text-lg">
+                                <i class="fa-solid fa-bone mr-3 text-amber-500 text-xl"></i> PetToken (POT)
+                            </h4>
+                            <p class="text-sm text-slate-600 mt-1">
+                                The **Reward & Governance Token**. Used to incentivize ethical data entry (Proof-of-Activity) and grant holders voting rights in the PetChain DAO.
+                            </p>
+                        </div>
+                        <div class="p-4 border-l-4 border-pink-500 bg-white hover:bg-pink-50 transition rounded-xl shadow-md">
+                            <h4 class="font-bold text-pink-800 flex items-center text-lg">
+                                <i class="fa-solid fa-heart-pulse mr-3 text-pink-500 text-xl"></i> PetNFT
+                            </h4>
+                            <p class="text-sm text-slate-600 mt-1">
+                                The **Identity & History Token**. A non-transferable token linked to a specific animal, storing immutable, encrypted pointers to their full medical history.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visual Diagram (CSS/HTML Constructed) -->
+                <div class="bg-slate-800 rounded-2xl p-8 relative shadow-2xl border border-slate-700">
+                    <div class="absolute top-4 right-4 p-2 bg-slate-700 rounded-full">
+                        <span class="text-xs text-slate-400 font-mono">PoA FLOW</span>
+                    </div>
+
+                    <div class="flex flex-col gap-6 mt-4">
+                        <!-- Step 1: Caregiver Action -->
+                        <div class="flex items-start gap-4">
+                            <div class="w-14 h-14 rounded-full bg-slate-700 flex items-center justify-center text-white font-bold text-lg border-2 border-slate-600 shadow-inner">
+                                <i class="fa-solid fa-syringe text-sky-400"></i>
+                            </div>
+                            <div class="bg-slate-700 p-4 rounded-lg border border-slate-600 flex-1">
+                                <span class="text-sky-300 font-bold text-sm block mb-1">1. Submit Activity (Vet)</span>
+                                <p class="text-slate-300 text-sm">A caregiver submits a new, verified medical record hash against a PetNFT.</p>
+                            </div>
+                        </div>
+
+                        <!-- Connector -->
+                        <div class="h-6 border-l-2 border-dashed border-slate-500 ml-7"></div>
+
+                        <!-- Step 2: Blockchain Verification -->
+                        <div class="flex items-start gap-4">
+                            <div class="w-14 h-14 rounded-full bg-slate-700 flex items-center justify-center text-white font-bold text-lg border-2 border-slate-600 shadow-inner">
+                                <i class="fa-solid fa-microchip text-purple-400"></i>
+                            </div>
+                            <div class="bg-slate-700 p-4 rounded-lg border border-slate-600 flex-1">
+                                <span class="text-purple-300 font-bold text-sm block mb-1">2. Validate Proof (Chain)</span>
+                                <p class="text-slate-300 text-sm">The network verifies the PoA (Proof-of-Activity) submission is valid and accurate.</p>
+                            </div>
+                        </div>
+
+                        <!-- Connector -->
+                        <div class="h-6 border-l-2 border-dashed border-slate-500 ml-7"></div>
+
+                        <!-- Step 3: Reward Minting -->
+                        <div class="flex items-start gap-4">
+                            <div class="w-14 h-14 rounded-full bg-emerald-900/50 flex items-center justify-center text-emerald-400 font-bold text-lg border-2 border-emerald-500/50 shadow-inner">
+                                <i class="fa-solid fa-coins text-emerald-400"></i>
+                            </div>
+                            <div class="bg-emerald-900/20 p-4 rounded-lg border border-emerald-500/50 flex-1">
+                                <span class="text-emerald-400 font-bold text-sm block mb-1">3. Mint Reward (POT)</span>
+                                <p class="text-emerald-200 text-sm">The contract automatically mints new POT tokens and sends them to the submitting wallet.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 3: Tokenomics Dashboard -->
+    <section id="tokenomics" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-slate-900 flex items-center justify-center">
+                    Economic Health & Sustainability
+                    <!-- Placeholder Image: Focus on community/growth -->
+                    <img src="https://placehold.co/60x60/e0f2f1/047857?text=Growth" alt="Growing community chart" class="w-12 h-12 rounded-full ml-4 shadow-md border-2 border-slate-100" onerror="this.style.display='none'">
+                </h2>
+                <p class="text-slate-600 max-w-3xl mx-auto mt-2">
+                    A fixed supply of 1 Billion POT, distributed with strict vesting schedules to ensure long-term alignment for our partners. This ensures stability for our community.
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Chart 1: Allocation -->
+                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 shadow-lg">
+                    <h3 class="font-bold text-xl text-slate-800 mb-6 text-center flex items-center justify-center">
+                        <i class="fa-solid fa-chart-pie mr-2 text-emerald-500"></i> Token Allocation
+                    </h3>
+                    <div class="chart-container">
+                        <canvas id="allocationChart"></canvas>
+                    </div>
+                    <div class="mt-4 text-center text-sm text-slate-500">
+                        <em>Hover segments for details on lock-up periods.</em>
+                    </div>
+                </div>
+
+                <!-- Chart 2: Vesting Schedule -->
+                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 shadow-lg">
+                    <h3 class="font-bold text-xl text-slate-800 mb-6 text-center flex items-center justify-center">
+                        <i class="fa-solid fa-clock mr-2 text-sky-500"></i> 5-Year Vesting Schedule
+                    </h3>
+                    <div class="chart-container">
+                        <canvas id="vestingChart"></canvas>
+                    </div>
+                    <div class="mt-4 text-sm text-slate-600 bg-white p-3 rounded-xl border border-slate-100 shadow-inner">
+                        <i class="fa-solid fa-info-circle text-emerald-600 mr-2"></i>
+                        <strong>Long-Term Commitment:</strong> The mandatory cliff periods ensure our core team and shelter partners are committed for the long haul before receiving full token access.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 4: Governance DAO Simulator -->
+    <section id="dao" class="py-20 bg-slate-900 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-2 gap-16">
+                <!-- Explained -->
+                <div>
+                    <h2 class="text-4xl font-bold mb-6 text-emerald-400">Ecosystem Health Simulator</h2>
+                    <p class="text-slate-400 mb-8">
+                        The PetChain DAO governs the network's financial stability. By adjusting the key parameters—Reward Rate and Burn Fee—you can see the real-time impact on the net token supply.
+                    </p>
+
+                    <!-- Simulator Controls -->
+                    <div class="space-y-8 bg-slate-800 p-8 rounded-2xl border border-slate-700 shadow-2xl">
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <label class="text-base font-bold text-emerald-400 flex items-center"><i class="fa-solid fa-paw mr-2"></i> Reward Rate (Incentive)</label>
+                                <span id="rewardVal" class="text-base font-mono text-white bg-slate-700 px-2 py-0.5 rounded">15 POT</span>
+                            </div>
+                            <input type="range" min="5" max="50" value="15" id="rewardSlider" oninput="updateSimulation()">
+                            <p class="text-xs text-slate-500 mt-2">Reward paid to Caregivers per new pet entry (PoA).</p>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <label class="text-base font-bold text-sky-400 flex items-center"><i class="fa-solid fa-users mr-2"></i> Daily Adoption Activity</label>
+                            <span id="activityVal" class="text-base font-mono text-white bg-slate-700 px-2 py-0.5 rounded">1000 Trans/day</span>
+                            </div>
+                            <input type="range" min="100" max="5000" step="100" value="1000" id="activitySlider" oninput="updateSimulation()">
+                            <p class="text-xs text-slate-500 mt-2">Number of PetNFT transfers/adoptions processed daily.</p>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <label class="text-base font-bold text-amber-400 flex items-center"><i class="fa-solid fa-fire-alt mr-2"></i> Burn Fee % (Deflation)</label>
+                                <span id="burnVal" class="text-base font-mono text-white bg-slate-700 px-2 py-0.5 rounded">2 %</span>
+                            </div>
+                            <input type="range" min="0" max="10" step="0.5" value="2" id="burnSlider" oninput="updateSimulation()">
+                            <p class="text-xs text-slate-500 mt-2">Percentage of transaction value burned (removed from circulation).</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Simulation Output -->
+                <div class="flex flex-col justify-center">
+                    <div class="bg-slate-800 rounded-2xl p-8 border border-slate-700 text-center shadow-2xl">
+                        <h3 class="text-xl font-bold mb-8 text-white">Daily Net Supply Change</h3>
+
+                        <div class="flex justify-center items-end gap-8 h-48 mb-6">
+                            <!-- Emission Bar -->
+                            <div class="flex flex-col items-center w-28">
+                                <span id="inflationText" class="text-sm mb-2 text-emerald-400 font-mono">+15,000</span>
+                                <div id="inflationBar" class="w-full bg-emerald-500 rounded-t-lg transition-all duration-500" style="height: 50%"></div>
+                                <span class="text-xs mt-3 text-slate-400">Emitted (New POT)</span>
+                            </div>
+
+                            <!-- Burn Bar -->
+                            <div class="flex flex-col items-center w-28">
+                                <span id="deflationText" class="text-sm mb-2 text-amber-400 font-mono">-2,000</span>
+                                <div id="deflationBar" class="w-full bg-amber-500 rounded-t-lg transition-all duration-500" style="height: 10%"></div>
+                                <span class="text-xs mt-3 text-slate-400">Burned (Deflation)</span>
+                            </div>
+                        </div>
+
+                        <div class="border-t border-slate-700 pt-6">
+                            <span class="text-slate-400 text-sm uppercase tracking-widest block mb-2">Ecosystem Status</span>
+                            <div id="netStatus" class="text-4xl font-bold text-emerald-400 font-heading">HEALTHY GROWTH</div>
+                            <p id="netAmount" class="text-slate-300 mt-2 text-lg">Net Supply Growth: +13,000 POT/Day</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 5: Roadmap -->
+    <section class="py-20 bg-slate-50">
+        <div class="max-w-4xl mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center text-slate-900 mb-12 flex items-center justify-center">
+                <i class="fa-solid fa-route mr-3 text-sky-500"></i> Our Paws-itive Roadmap
+            </h2>
+
+            <div class="relative border-l-4 border-emerald-300 ml-6 md:ml-0 space-y-12">
+
+                <!-- Item 1: Foundation -->
+                <div class="relative pl-12 md:pl-0">
+                    <div class="absolute -left-3 md:left-1/2 md:-ml-3 w-8 h-8 bg-emerald-500 rounded-full border-4 border-white shadow-md flex items-center justify-center text-white"><i class="fa-solid fa-code"></i></div>
+                    <div class="md:w-1/2 md:pr-12 md:text-right md:ml-0 bg-white p-4 rounded-xl shadow-lg border border-slate-100">
+                        <span class="text-emerald-600 font-bold text-sm tracking-wide">Phase 1: Foundation (T-0)</span>
+                        <h4 class="text-xl font-bold text-slate-800 mt-1">Security Audit & Testnet Deploy</h4>
+                        <p class="text-slate-600 mt-2 text-sm">Ensuring all smart contracts are rigorously tested, audited, and deployed to a public test network for community bug bounty hunting.</p>
+                    </div>
+                </div>
+
+                <!-- Item 2: Pilot Program -->
+                <div class="relative pl-12 md:pl-0">
+                    <div class="absolute -left-3 md:left-1/2 md:-ml-3 w-8 h-8 bg-sky-500 rounded-full border-4 border-white shadow-md flex items-center justify-center text-white"><i class="fa-solid fa-house-chimney-medical"></i></div>
+                    <div class="md:w-1/2 md:ml-auto md:pl-12 bg-white p-4 rounded-xl shadow-lg border border-slate-100">
+                        <span class="text-sky-600 font-bold text-sm tracking-wide">Phase 2: Pilot Program (+6 Mo)</span>
+                        <h4 class="text-xl font-bold text-slate-800 mt-1">Shelter Onboarding & Liquidity</h4>
+                        <p class="text-slate-600 mt-2 text-sm">Partnering with regional shelter networks to test the Proof-of-Activity system in a real-world environment. Establishing initial token liquidity.</p>
+                    </div>
+                </div>
+
+                <!-- Item 3: Full Scale -->
+                <div class="relative pl-12 md:pl-0">
+                    <div class="absolute -left-3 md:left-1/2 md:-ml-3 w-8 h-8 bg-amber-500 rounded-full border-4 border-white shadow-md flex items-center justify-center text-white"><i class="fa-solid fa-rocket"></i></div>
+                    <div class="md:w-1/2 md:pr-12 md:text-right md:ml-0 bg-white p-4 rounded-xl shadow-lg border border-slate-100">
+                        <span class="text-amber-600 font-bold text-sm tracking-wide">Phase 3: Full Scale (+12 Mo)</span>
+                        <h4 class="text-xl font-bold text-slate-800 mt-1">Mainnet Launch & Full DAO</h4>
+                        <p class="text-slate-600 mt-2 text-sm">Full launch on a low-fee chain (e.g., Polygon) and transferring the entire Treasury control and parameter adjustment mechanism to the POT holders.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer / Technical Appendix -->
+    <footer class="bg-slate-900 border-t border-slate-800 text-slate-400 py-12">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <h4 class="text-white font-bold mb-6 text-xl">Technical Appendix: Verification</h4>
+
+            <div class="grid md:grid-cols-2 gap-4 max-w-3xl mx-auto mb-10">
+                <div class="bg-slate-800 p-4 rounded-xl text-left border border-slate-700 shadow-inner">
+                    <span class="text-xs text-amber-400 uppercase font-bold block mb-1">PetToken ($POT) Contract</span>
+                    <code class="text-sm font-mono text-slate-200 break-all">0x8D8D91030A8D264328A89484Cf726eDeaC6Cd9DB</code>
+                    <p class="text-xs text-slate-500 mt-1">Standard ERC-20, fixed supply (1B).</p>
+                </div>
+                <div class="bg-slate-800 p-4 rounded-xl text-left border border-slate-700 shadow-inner">
+                    <span class="text-xs text-pink-400 uppercase font-bold block mb-1">PetNFT (Identity) Contract</span>
+                    <code class="text-sm font-mono text-slate-200 break-all">0x11155EfcC05E4d0B8427FD03AD1cf946ee1E9937</code>
+                    <p class="text-xs text-slate-500 mt-1">Non-transferable ERC-721 equivalent for pet history.</p>
+                </div>
+            </div>
+
+            <p class="text-sm">
+                Project developed for Blockchain & Crypto Assets Assessment.<br>
+                &copy; 2025 PetChain Foundation. All rights reserved.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Gemini Explainer Button (Fixed) -->
+    <button id="explainerBtn" class="fixed bottom-6 right-6 p-4 rounded-full bg-emerald-500 text-white shadow-2xl hover:bg-emerald-600 transition transform hover:scale-110 z-50" onclick="toggleExplainerModal(true)">
+        <i class="fa-solid fa-dog text-2xl"></i>
+    </button>
+
+    <!-- Gemini Explainer Modal -->
+    <div id="explainerModal" class="fixed inset-0 hidden flex items-center justify-center modal-overlay">
+        <div class="bg-white rounded-xl shadow-2xl modal-content w-full max-w-lg mx-4 p-6 flex flex-col h-auto max-h-[90vh]">
+
+            <!-- Header -->
+            <div class="flex justify-between items-center pb-4 border-b border-slate-200">
+                <h3 class="text-xl font-bold text-slate-800 flex items-center">
+                    <span class="text-emerald-600 mr-2"><i class="fa-solid fa-cat"></i></span> Friendly Protocol Explainer
+                </h3>
+                <button onclick="toggleExplainerModal(false)" class="text-slate-500 hover:text-slate-800 transition">
+                    <i class="fa-solid fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Chat Area -->
+            <div id="chatOutput" class="flex-grow overflow-y-auto py-4 space-y-4">
+                <div class="bg-emerald-50 p-3 rounded-xl text-sm border border-emerald-200">
+                    <p class="font-semibold text-emerald-700 mb-1">PetChain Bot:</p>
+                    <p class="text-slate-700">Woof! I'm here to help you understand all the complex parts of PetChain. Try asking me, "What is Proof-of-Activity?" or "Explain how the PetNFT works."</p>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="pt-4 border-t border-slate-200">
+                <div class="flex gap-2">
+                    <input type="text" id="userInput" placeholder="Ask about Tokens, Rewards, or Pet Identity..." class="flex-grow p-3 border border-slate-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500" onkeydown="if(event.key === 'Enter') generateExplanation()">
+                    <button onclick="generateExplanation()" id="sendBtn" class="p-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
+                <div id="errorMsg" class="text-red-500 text-xs mt-2 hidden"></div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- JavaScript Logic -->
+    <script>
+        const API_KEY = "";
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${API_KEY}`;
+
+        // --- 1. Interaction Logic for Problem Cards ---
+        function toggleProblemDetails(id) {
+            const detailEl = document.getElementById(id + '-details');
+            const iconEl = document.getElementById(id + '-icon');
+
+            if (detailEl.classList.contains('hidden')) {
+                detailEl.classList.remove('hidden');
+                iconEl.classList.remove('fa-chevron-down');
+                iconEl.classList.add('fa-chevron-up');
+            } else {
+                detailEl.classList.add('hidden');
+                iconEl.classList.remove('fa-chevron-up');
+                iconEl.classList.add('fa-chevron-down');
+            }
+        }
+
+        // --- 2. Tokenomics Charts (Chart.js) ---
+        let allocationChart, vestingChart;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // A. Allocation Doughnut Chart
+            const ctxAlloc = document.getElementById('allocationChart').getContext('2d');
+            allocationChart = new Chart(ctxAlloc, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Community Incentives (50%)', 'Shelters & Partners (20%)', 'Core Team (20%)', 'Treasury (10%)'],
+                    datasets: [{
+                        data: [50, 20, 20, 10],
+                        // Pet-friendly colors: Emerald, Sky, Orange, Gray
+                        backgroundColor: ['#10b981', '#3b82f6', '#f97316', '#64748b'],
+                        borderWidth: 0,
+                        hoverOffset: 15
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { usePointStyle: true, font: { family: 'Inter' } } },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const labels = [
+                                        "500M POT: Used for PoA rewards over 5 years (The main incentive pool).",
+                                        "200M POT: 1-year cliff, 3-year linear vesting (Ensuring long-term shelter support).",
+                                        "200M POT: 1.5-year cliff, 4-year linear vesting (Aligning the core development team).",
+                                        "100M POT: Controlled by DAO for emergencies and unexpected needs (Community Safety Fund)."
+                                    ];
+                                    return labels[context.dataIndex];
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // B. Vesting Schedule Line Chart
+            const ctxVest = document.getElementById('vestingChart').getContext('2d');
+            vestingChart = new Chart(ctxVest, {
+                type: 'line',
+                data: {
+                    labels: ['T-0', 'Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5'],
+                    datasets: [
+                        {
+                            label: 'Community (Emission)',
+                            data: [0, 20, 40, 60, 80, 100], // Linear emission
+                            borderColor: '#10b981', // Emerald
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            pointBackgroundColor: '#10b981',
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Core Team (Cliff + Vest)',
+                            data: [0, 0, 10, 35, 70, 100], // 1.5y Cliff then linear
+                            borderColor: '#f97316', // Orange
+                            backgroundColor: 'rgba(249, 115, 22, 0.1)',
+                            pointBackgroundColor: '#f97316',
+                            borderDash: [8, 4],
+                            tension: 0.2
+                        },
+                        {
+                            label: 'Shelters (Cliff + Vest)',
+                            data: [0, 0, 33, 66, 100, 100], // 1y Cliff then linear
+                            borderColor: '#3b82f6', // Blue
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            pointBackgroundColor: '#3b82f6',
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: '% of Pool Released' },
+                            grid: { color: '#e2e8f0' }
+                        },
+                        x: { grid: { display: false } }
+                    },
+                    plugins: {
+                        tooltip: { mode: 'index', intersect: false }
+                    }
+                }
+            });
+
+            // Initial Simulator Run
+            updateSimulation();
+        });
+
+        // --- 3. DAO Simulator Logic ---
+        function updateSimulation() {
+            const rewardRate = parseInt(document.getElementById('rewardSlider').value);
+            const activity = parseInt(document.getElementById('activitySlider').value);
+            const burnPct = parseFloat(document.getElementById('burnSlider').value);
+
+            // Assuming an average transaction value for the burn calculation (e.g., adoption fee or premium service cost)
+            const avgTxValue = 50; // $50 USD equivalent value
+            
+            // Daily POT minted via PoA
+            const dailyMint = rewardRate * activity; 
+            // Daily POT burned via Tx fees (assuming Tx fee is fixed, Burn is % of *that* fee)
+            const dailyBurn = (burnPct / 100) * (activity * avgTxValue); 
+
+            const netChange = dailyMint - dailyBurn;
+
+            document.getElementById('rewardVal').innerText = rewardRate + " POT";
+            document.getElementById('activityVal').innerText = activity.toLocaleString() + " Tx/day";
+            document.getElementById('burnVal').innerText = burnPct.toFixed(1) + " %";
+
+            document.getElementById('inflationText').innerText = "+" + Math.round(dailyMint).toLocaleString();
+            document.getElementById('deflationText').innerText = "-" + Math.round(dailyBurn).toLocaleString();
+
+            const maxVal = Math.max(dailyMint, dailyBurn, 10000); // Dynamic max height
+            const mintHeight = Math.min((dailyMint / maxVal) * 100, 100);
+            const burnHeight = Math.min((dailyBurn / maxVal) * 100, 100);
+
+            document.getElementById('inflationBar').style.height = mintHeight + "%";
+            document.getElementById('deflationBar').style.height = burnHeight + "%";
+
+            // Update bar colors
+            document.getElementById('inflationBar').style.backgroundColor = '#34d399'; // Light Emerald
+            document.getElementById('deflationBar').style.backgroundColor = '#fbbf24'; // Amber
+
+            const statusEl = document.getElementById('netStatus');
+            const netAmountEl = document.getElementById('netAmount');
+
+            if (netChange > 0) {
+                statusEl.innerText = "HEALTHY GROWTH";
+                statusEl.className = "text-4xl font-bold text-emerald-400 font-heading";
+                netAmountEl.innerText = `Net Supply Growth: +${Math.round(netChange).toLocaleString()} POT/Day`;
+            } else if (netChange < 0) {
+                statusEl.innerText = "BALANCED DEFLATION";
+                statusEl.className = "text-4xl font-bold text-sky-400 font-heading";
+                netAmountEl.innerText = `Net Supply Reduction: ${Math.round(netChange).toLocaleString()} POT/Day`;
+            } else {
+                statusEl.innerText = "PERFECT BALANCE";
+                statusEl.className = "text-4xl font-bold text-amber-400 font-heading";
+                netAmountEl.innerText = `Net Supply Change: 0 POT/Day`;
+            }
+        }
+
+        // --- 4. Gemini Explainer Logic (LLM Integration) ---
+
+        function toggleExplainerModal(show) {
+            document.getElementById('explainerModal').classList.toggle('hidden', !show);
+        }
+
+        async function callGeminiApi(payload, retries = 0) {
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.status === 429 && retries < 5) {
+                    const delay = Math.pow(2, retries) * 1000;
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    return callGeminiApi(payload, retries + 1);
+                }
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                return await response.json();
+            } catch (error) {
+                document.getElementById('errorMsg').innerText = "API Call Failed. Check console for details.";
+                document.getElementById('errorMsg').classList.remove('hidden');
+                console.error("Gemini API Error:", error);
+                return null;
+            }
+        }
+
+        function appendMessage(sender, text) {
+            const output = document.getElementById('chatOutput');
+            const isUser = sender === 'user';
+
+            const messageEl = document.createElement('div');
+            messageEl.className = isUser ? 'text-right' : 'bg-emerald-50 p-3 rounded-xl text-sm border border-emerald-200 shadow-sm';
+
+            const innerHtml = isUser
+                ? `<p class="inline-block bg-sky-100 text-slate-800 p-3 rounded-xl max-w-xs md:max-w-md text-left shadow-md">${text}</p>`
+                : `<p class="font-semibold text-emerald-700 mb-1 flex items-center"><i class="fa-solid fa-bone mr-2"></i> PetChain Bot:</p><p class="text-slate-700">${text}</p>`;
+
+            messageEl.innerHTML = innerHtml;
+            output.appendChild(messageEl);
+            output.scrollTop = output.scrollHeight; // Scroll to bottom
+        }
+
+        function appendLoading(show) {
+            let loader = document.getElementById('loadingIndicator');
+            if (!loader) {
+                loader = document.createElement('div');
+                loader.id = 'loadingIndicator';
+                loader.className = 'flex items-center space-x-2 p-3 text-sm text-slate-500';
+                loader.innerHTML = `
+                    <i class="fa-solid fa-dog fa-beat-fade text-xl text-emerald-500"></i>
+                    <span>Sniffing out the answer... Please wait!</span>
+                `;
+            }
+            const output = document.getElementById('chatOutput');
+            if (show) {
+                output.appendChild(loader);
+                output.scrollTop = output.scrollHeight;
+            } else if (loader.parentNode) {
+                loader.parentNode.removeChild(loader);
+            }
+        }
+
+        async function generateExplanation() {
+            const userInputEl = document.getElementById('userInput');
+            const sendBtn = document.getElementById('sendBtn');
+            const userQuery = userInputEl.value.trim();
+
+            if (!userQuery) return;
+
+            // Clear previous error message
+            document.getElementById('errorMsg').classList.add('hidden');
+
+            // 1. Display user query and lock UI
+            appendMessage('user', userQuery);
+            userInputEl.value = '';
+            sendBtn.disabled = true;
+            appendLoading(true);
+
+            const systemPrompt = "You are the PetChain Protocol Explainer Bot, speaking with a warm, friendly, and slightly enthusiastic tone, like a helpful pet owner or animal caretaker. Your sole purpose is to simplify complex token engineering, blockchain, and animal welfare concepts from the PetChain Whitepaper into clear, concise, and easy-to-understand explanations suitable for a non-technical audience. Use analogies involving pets (treats, bones, leashes, play, etc.) if it helps simplify the concept. Answer the user's question in 2-3 sentences.";
+
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                tools: [{ "google_search": {} }],
+                systemInstruction: {
+                    parts: [{ text: systemPrompt }]
+                }
+            };
+
+            try {
+                const result = await callGeminiApi(payload);
+
+                if (!result || !result.candidates || result.candidates.length === 0) {
+                    throw new Error("Invalid response structure from API.");
+                }
+
+                const candidate = result.candidates[0];
+                const generatedText = candidate.content?.parts?.[0]?.text || "Oops! I seem to have chased my tail. Could you try asking that in a different way?";
+
+                // 2. Extract sources and format
+                let sourceText = '';
+                const groundingMetadata = candidate.groundingMetadata;
+                if (groundingMetadata && groundingMetadata.groundingAttributions) {
+                    const sources = groundingMetadata.groundingAttributions
+                        .map(attribution => ({
+                            uri: attribution.web?.uri,
+                            title: attribution.web?.title,
+                        }))
+                        .filter(source => source.uri && source.title);
+
+                    if (sources.length > 0) {
+                        sourceText = `<div class="mt-2 pt-2 border-t border-slate-300 text-xs text-slate-500">Source: <a href="${sources[0].uri}" target="_blank" class="hover:underline text-sky-600">${sources[0].title}</a></div>`;
+                    }
+                }
+
+                // 3. Display LLM response
+                appendMessage('bot', generatedText + sourceText);
+
+            } catch (error) {
+                appendMessage('bot', 'A quick nap was interrupted! An error occurred while fetching the explanation. Please try again.');
+                console.error(error);
+            } finally {
+                // 4. Unlock UI
+                appendLoading(false);
+                sendBtn.disabled = false;
+                userInputEl.focus();
+            }
+        }
+
+        // Initial run to update the simulator output on load
+        window.onload = function() {
+            updateSimulation();
+        };
+
+    </script>
+</body>
+</html>
